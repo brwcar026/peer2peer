@@ -8,7 +8,13 @@ def leecher():
     sentence = input("Input the file you want to download: ")
     #file = open(sentence, "r") 
     clientSocket.send(sentence.encode())
-    #modifiedSentence = clientSocket.recv(1024)
+    recvdFile = clientSocket.recv(1024).decode()
+    _, filename = recvdFile.split()
+    with open(filename, "wb") as file:
+        while chunk:= clientSocket.recv(1024):
+            file.write(chunk)
+
+    choice = input("File has been Downloaded, would you like to become a seeder?")
     #print("From Server: ", modifiedSentence.decode())
     clientSocket.close()
 
