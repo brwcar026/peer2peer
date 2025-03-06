@@ -1,6 +1,6 @@
 from socket import *
 
-from testSeeder import seeder
+from Seeder import seeder
 
 def leecher():
     serverName = "127.0.0.1"  
