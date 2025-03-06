@@ -25,4 +25,4 @@ def seeder():
         connectionSocket.close() #closes the socket
 
 if __name__ == "__main__":
-    seeder() #runs the leecher class
+    seeder() #runs the seeder class
