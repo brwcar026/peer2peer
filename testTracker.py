@@ -4,7 +4,7 @@ seeders = {}
 
 def tracker():
     udp_trackerPort = 12002
-    udp_IP = "192.168.1.111"
+    udp_IP = "127.0.0.1"
     udpSocket = socket(AF_INET, SOCK_DGRAM)
     udpSocket.bind((udp_IP, udp_trackerPort))
     print("The server is ready to track available seeders")
