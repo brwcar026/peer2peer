@@ -1,5 +1,7 @@
 from socket import *
 
+from testSeeder import seeder
+
 def leecher():
     serverName = "127.0.0.1"  
     serverPort = 12000
@@ -13,8 +15,13 @@ def leecher():
             file.write(chunk)
     
     print("File has been downloaded successfully!")
-    choice = input("Would you like to become a seeder? (yes/no): ")
-    clientSocket.close()
+    choice = input("Would you like to become a seeder? (yes/no): ").lower()
+    if choice == "yes":
+        #add code to become a seeder
+        seeder()
+    else:
+        print("Thank you")
+        clientSocket.close()
 
 if __name__ == "__main__":
     leecher()
