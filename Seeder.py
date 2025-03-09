@@ -1,19 +1,19 @@
 import socket
 
 def connectToTracker(filename, port):
-    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    register = "REGISTER " + filename + " " + str(port)
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+    register = "REGISTER " + filename + " " + str(port) #sends a message to the tracker saying the seeder wishes to be tracked
     udp_socket.sendto(register.encode(), ("127.0.0.1", 12002))
 
     response, _ = udp_socket.recvfrom(2048)
     decoded = response.decode()
 
-    if decoded == "REGISTERED":
+    if decoded == "REGISTERED": #if there was a positive confirmation, print so on the seeder side, if not, print an error message
         print("Successfully registered with tracker")
     else:
         print("Could not register with tracker")
 
-    udp_socket.close()
+    udp_socket.close() #closes the udp socket
 
 def leecherSend(connectionSocket):
     filename = connectionSocket.recv(1024).decode() # receives the requested file name from the leecher
@@ -23,7 +23,7 @@ def leecherSend(connectionSocket):
         filename, start, end = filename.split("|")
         start, end = int(start), int(end)
 
-        print (f"Sending bytes {start} to {end}")
+        print (f"Sending bytes {start} to {end}") #clarifies which byte of the file the seeder is sending
 
         with open(filename, "rb") as file:
             file.seek(start)
@@ -53,6 +53,6 @@ def seeder(port, filename):
 if __name__ == "__main__":
     filename = input("Enter the filename you want to seed: ")
     port = input("Enter the port you would like to use (from 12002): ")
-    connectToTracker(filename, int(port))
+    connectToTracker(filename, int(port)) # connects to the tracker
     seeder(int(port), filename) #runs the seeder class
-    #connectToTracker(filename, int(port))
+    
