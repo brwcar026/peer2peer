@@ -10,7 +10,7 @@ def trackClient(message, clientAddress, udpSocket):
     modifiedMessage = message.decode().upper()
     #print(f"Received message: {modifiedMessage}")
     
-    splitProtocol = decodedMessage.split()
+    splitProtocol = modifiedMessage.split()
     
     if splitProtocol[0] == "REGISTER":
         file = splitProtocol[1]
@@ -22,27 +22,18 @@ def trackClient(message, clientAddress, udpSocket):
         seederInfo = {'ip': seederIPAdd, 'port':seederPort, 'Latest Active Time': time.time()}
         seeders[file].append(seederInfo)
         #print(f"Seeder {seeder_ip}:{seeder_port} registered for file {file_name}")
-        udpSocket.sendto("REGISTERED", clientAddress)# send a confirmation message to seeder
+        udpSocket.sendto(b"REGISTERED", clientAddress)# send a confirmation message to seeder
     
     elif splitProtocol[0] == "QUERY":
         file = splitProtocol[1]
-        if file in seeders:
-            '''activeSeeders = []
-            for ip in seeders[file]:
-                t = 
-                if time.time() - t < 60:
-                    active_seeders.append((ip, port, t))
-            seeders[file_name] = active_seeders'''
-            
-            #seeders[file_name] = [(ip, port, t) for (ip, port, t) in seeders[file_name] if time.time() - t < 60]
-            
+        if file in seeders:          
             activeSeeders = []
             for seeder in seeders[file]:
                 if (time.time() - seeder['Latest Active Time']) < 60:
                     activeSeeders.append(seeder)
             if activeSeeders == []:
                 # No active seeders found
-                udpSocket.sendto("No Active Seeders", clientAddress)
+                udpSocket.sendto(b"No_Active_Seeders", clientAddress)
                 print(f"No active seeders found for file {file}")
             else:
                 # Format: "ip1:port1 ip2:port2 ..."
@@ -55,11 +46,20 @@ def trackClient(message, clientAddress, udpSocket):
                 
                 '''seederList = ",".join([f"{seeder['ip']}:{seeder['port']}" for seeder in activeSeeders])
                 udpSocket.sendto(seederList.encode(), clientAddress)
-                print(f"Sent active seeders for file {file} to {clientAddress}: {seederList}")'''               
+                print(f"Sent active seeders for file {file} to {clientAddress}: {seederList}")''' 
+                
+                '''activeSeeders = []
+                for ip in seeders[file]:
+                t = 
+                if time.time() - t < 60:
+                    active_seeders.append((ip, port, t))
+                    seeders[file_name] = active_seeders
+            
+                seeders[file_name] = [(ip, port, t) for (ip, port, t) in seeders[file_name] if time.time() - t < 60]'''              
                 
         else:
             # File not found in seeders
-            udpSocket.sendto("File Not Found", clientAddress)
+            udpSocket.sendto(b"File_Not_Found", clientAddress)
             print(f"File {file} not found")   
 
 def tracker():
@@ -68,10 +68,12 @@ def tracker():
     udpSocket = socket(AF_INET, SOCK_DGRAM)
     udpSocket.bind((udp_IP, udp_trackerPort))
     print("The server is ready to track available seeders")
+    
     while True:
         message, clientAddress = udpSocket.recvfrom(2048)
-        modifiedMessage = message.decode().upper()
-        udpSocket.sendto(modifiedMessage.encode(), clientAddress)
+        trackerClientThread = Thread(target=trackClient, args=(message, clientAddress, udpSocket))
+        trackerClientThread.start()
+        #Thread(target=trackClient, args=(message, clientAddress, udpSocket)).start()
 
 if __name__ == "__main__":
     tracker()
