@@ -71,7 +71,7 @@ def tracker():
     
     while True:
         message, clientAddress = udpSocket.recvfrom(2048)
-        trackerClientThread = Thread(target=trackClient, args=(message, clientAddress, udpSocket))
+        trackerClientThread = threading.Thread(target=trackClient, args=(message, clientAddress, udpSocket))
         trackerClientThread.start()
         #Thread(target=trackClient, args=(message, clientAddress, udpSocket)).start()
 
