@@ -1,4 +1,5 @@
 from socket import *
+import threading
 
 from Seeder import seeder
 
@@ -18,7 +19,10 @@ def leecher():
     choice = input("Would you like to become a seeder? (yes/no): ").lower() # asks user if they would like to become a tcp server, converts reply to lower case as well
     if choice == "yes":
         #add code to become a seeder
-        toSeeder()
+        #toSeeder()
+        seeder_thread = threading.Thread(target = toSeeder)
+        seeder_thread.start()
+        seeder_thread.join()
     else:
         print("Thank you") 
         clientSocket.close()
