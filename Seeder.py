@@ -1,6 +1,6 @@
 from socket import*
 
-def leechers(connectionSocket):
+def leecherSend(connectionSocket):
     filename = connectionSocket.recv(1024).decode() # receives the requested file name from the leecher
     print("File to be sent: ", filename) #verifies the correct file to be downloaded
         
@@ -29,7 +29,7 @@ def seeder(port, filename):
     while True:
         connectionSocket, addr = serverSocket.accept()
         print("Connected to Leecher at: ", addr) # provides information about the leecher currently connected to the seeder
-        leechers(connectionSocket)
+        leecherSend(connectionSocket)
 
 if __name__ == "__main__":
     filename = input("Enter the filename you want to seed: ")
