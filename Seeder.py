@@ -1,30 +1,49 @@
-from socket import*
+import socket
+
+def connectToTracker(filename, port):
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    register = "REGISTER " + filename + " " + str(port)
+    udp_socket.sendto(register.encode(), ("127.0.0.1", 12002))
+
+    response, _ = udp_socket.recvfrom(2048)
+    decoded = response.decode()
+
+    if decoded == "REGISTERED":
+        print("Successfully registered with tracker")
+    else:
+        print("Could not register with tracker")
+
+    udp_socket.close()
 
 def leecherSend(connectionSocket):
     filename = connectionSocket.recv(1024).decode() # receives the requested file name from the leecher
-    print("File to be sent: ", filename) #verifies the correct file to be downloaded
+    print("File to be sent: " + filename) #verifies the correct file to be downloaded
         
     try:
         filename, start, end = filename.split("|")
         start, end = int(start), int(end)
 
-        print ("Sending bytes " + start + " to " + end)
+        print (f"Sending bytes {start} to {end}")
+
         with open(filename, "rb") as file:
-            while chunk := file.read(1024):
-                connectionSocket.send(chunk) # sends the file to the leecher in chunks of size 1024 bytes
-        print("File sent successfully!") #confirmation message from the seeder
+            file.seek(start)
+            chunk = file.read(end - start)
+            connectionSocket.sendall(chunk) # sends the file to the leecher in chunks of size 1024 bytes
+
+            print("File chunk sent successfully!") #confirmation message from the seeder
+
     except FileNotFoundError:
         print("File not found!") # informs leecher the file could not be found
         connectionSocket.send(b"ERROR: File not found")
-        
-    connectionSocket.close() #closes the socket
+    finally:
+        connectionSocket.close() #closes the socket
 
 def seeder(port, filename):
     serverPort = port #port number for leechers to connect to
-    serverSocket = socket(AF_INET, SOCK_STREAM)
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind(("0.0.0.0", serverPort))
     serverSocket.listen(1)
-    print("The server is ready to send a file")
+    print(f"The server is ready to send " + filename + " on port " + str(port))
     
     while True:
         connectionSocket, addr = serverSocket.accept()
@@ -33,5 +52,7 @@ def seeder(port, filename):
 
 if __name__ == "__main__":
     filename = input("Enter the filename you want to seed: ")
-    port = ("Enter the port you would like to use (from 12000 to 12010): ")
-    seeder(port, filename) #runs the seeder class
+    port = input("Enter the port you would like to use (from 12002): ")
+    connectToTracker(filename, int(port))
+    seeder(int(port), filename) #runs the seeder class
+    #connectToTracker(filename, int(port))

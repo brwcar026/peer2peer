@@ -23,6 +23,7 @@ def trackClient(message, clientAddress, udpSocket):
         seeders[file].append(seederInfo)
         #print(f"Seeder {seeder_ip}:{seeder_port} registered for file {file_name}")
         udpSocket.sendto(b"REGISTERED", clientAddress)# send a confirmation message to seeder
+        print (seederPort + seederIPAdd + " has been registered")
     
     elif splitProtocol[0] == "QUERY":
         file = splitProtocol[1]
