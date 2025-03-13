@@ -2,6 +2,12 @@ import os
 from socket import *
 import threading
 import Seeder
+from tkinter import *
+from tkinter.ttk import *
+
+root = Tk()
+root.title("Download Progress")
+bar = Progressbar(root, orient= HORIZONTAL, length = 300, mode= "determinate")
 
 def getSeeders(filename): #method to receive the list of seeders from the tracker
     udp_socket = socket(AF_INET, SOCK_DGRAM)
@@ -25,7 +31,7 @@ def getSeeders(filename): #method to receive the list of seeders from the tracke
         return [(ip ,int(port)) for ip, port in seeders]
 
 #method downloads the file from all seeders available
-def downloadFile(seederIP, seederPort, filename, start, end, chunk_data):
+def downloadFile(seederIP, seederPort, filename, start, end, chunk_data, file_size):
     try:
         clientSocket = socket(AF_INET, SOCK_STREAM)
         clientSocket.connect((seederIP, seederPort))
@@ -67,10 +73,13 @@ def leecher(filename):
         start = i * chunkSize
         end = start + chunkSize if  i < numSeeders - 1 else file_size
 
-        thread = threading.Thread(target = downloadFile, args = (seederIP, seederPort, filename, start, end, chunkData)) 
+        thread = threading.Thread(target = downloadFile, args = (seederIP, seederPort, filename, start, end, chunkData, file_size)) 
         threads.append(thread)
         thread.start()
-
+        
+        bar["value"] = (end / file_size) * 100
+        root.update_idletasks()
+        
     for i in threads:
         thread.join()
 
@@ -90,7 +99,8 @@ def leecher(filename):
         Seeder.seeder(int(new_port), filename) #starts the seeder method
     else:
         print("Thank you") 
-        
+
+bar.pack(pady = 10)
 
 if __name__ == "__main__":
     filename = input("Input the file you want to download: ") # user requests a file to download
