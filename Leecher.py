@@ -2,9 +2,11 @@ import os
 from socket import *
 import threading
 import Seeder
-from tkinter import *
+#imports to create the gui 
+from tkinter import * 
 from tkinter.ttk import *
 
+#create the window with title "Download Porgress" and a horizontal progress bar 
 root = Tk()
 root.title("Download Progress")
 bar = Progressbar(root, orient= HORIZONTAL, length = 300, mode= "determinate")
@@ -77,8 +79,8 @@ def leecher(filename):
         threads.append(thread)
         thread.start()
         
-        bar["value"] = (end / file_size) * 100
-        root.update_idletasks()
+        bar["value"] = (end / file_size) * 100 #set the percentage to the end segment of the chunk being downloaded 
+        root.update_idletasks() #update the progress bar to ref;ect the amount of chunks that have been downloaded
         
     for i in threads:
         thread.join()
