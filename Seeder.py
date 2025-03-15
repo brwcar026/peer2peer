@@ -1,7 +1,8 @@
 import socket
-
+# Registers the Seeder with the Tracker
 def connectToTracker(filename, port):
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+    # Format: "REGISTER <filename> <port>"
     register = "REGISTER " + filename + " " + str(port) #sends a message to the tracker saying the seeder wishes to be tracked
     udp_socket.sendto(register.encode(), ("127.0.0.1", 12002))
 
@@ -15,16 +16,20 @@ def connectToTracker(filename, port):
 
     udp_socket.close() #closes the udp socket
 
+
+# Sends the requested file chunk to the Leecher
 def leecherSend(connectionSocket):
     filename = connectionSocket.recv(1024).decode() # receives the requested file name from the leecher
     print("File to be sent: " + filename) #verifies the correct file to be downloaded
         
     try:
+        # filename and byte range
         filename, start, end = filename.split("|")
         start, end = int(start), int(end)
 
         print (f"Sending bytes {start} to {end}") #clarifies which byte of the file the seeder is sending
 
+        #Read and send the file chunk
         with open(filename, "rb") as file:
             file.seek(start)
             chunk = file.read(end - start)
@@ -38,6 +43,7 @@ def leecherSend(connectionSocket):
     finally:
         connectionSocket.close() #closes the socket
 
+# Main fuunction for the Seeder. Listens for incoming connections from Leechers.
 def seeder(port, filename):
     serverPort = port #port number for leechers to connect to
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
