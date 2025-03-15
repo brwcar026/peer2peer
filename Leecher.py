@@ -80,7 +80,7 @@ def leecher(filename):
         thread.start()
         
         bar["value"] = (end / file_size) * 100 #set the percentage to the end segment of the chunk being downloaded 
-        root.update_idletasks() #update the progress bar to ref;ect the amount of chunks that have been downloaded
+        root.update_idletasks() #update the progress bar to reflect the amount of chunks that have been downloaded
         
     for i in threads:
         thread.join()
@@ -92,17 +92,19 @@ def leecher(filename):
             file.write(data) #writes the downloaded chunks into a new file 
     
         print("File has been downloaded successfully!") # confirmation message once all chunks have been received
-
+        
     choice = input("Would you like to become a seeder? (yes/no): ").lower() # asks user if they would like to become a tcp server, converts reply to lower case as well
     
     if choice == "yes":
+        root.destroy() #destroys the loading bar as quit seemed to stall too long
         new_port = input("Enter the port you would like to use (from 12002): ") #user chooses a new port number to send the file just downloaded to a new seeder
         Seeder.connectToTracker(filename, int(new_port)) # registers as seeder with tracker
         Seeder.seeder(int(new_port), filename) #starts the seeder method
+        
     else:
         print("Thank you") 
 
-bar.pack(pady = 10)
+bar.pack(pady = 10) # pack the loading bar into the main window
 
 if __name__ == "__main__":
     filename = input("Input the file you want to download: ") # user requests a file to download
