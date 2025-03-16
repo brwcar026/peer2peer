@@ -5,6 +5,8 @@ import Seeder
 #imports to create the gui 
 from tkinter import * 
 from tkinter.ttk import *
+import time 
+from datetime import datetime
 
 #create the window with title "Download Porgress" and a horizontal progress bar 
 root = Tk()
@@ -87,7 +89,9 @@ def leecher(filename):
 
     chunkData.sort() #sorts the data into the correct order
     
-    with open(f"downloaded_{filename}", "wb") as file:
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S") #creating a unique name for the downloaded file
+    unique_name = f"downloaded_{int(timestamp)}_{filename}"
+    with open(unique_name, "wb") as file:
         for _, data in chunkData:
             file.write(data) #writes the downloaded chunks into a new file 
     
